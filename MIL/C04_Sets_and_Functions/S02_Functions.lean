@@ -10,6 +10,9 @@ variable (f : α → β)
 variable (s t : Set α)
 variable (u v : Set β)
 
+#check f⁻¹' u
+#check f '' s
+
 open Function
 open Set
 
@@ -34,25 +37,73 @@ example : s ⊆ f ⁻¹' (f '' s) := by
   use x, xs
 
 example : f '' s ⊆ v ↔ s ⊆ f ⁻¹' v := by
-  sorry
+  constructor
+  . intro h
+    intro x xs
+    show f x ∈ v
+    apply h
+    use x
+  intro h x xfs
+  rcases xfs with ⟨y, ys, hyx⟩
+  #check h ys
+  rw [<-hyx]
+  apply h ys
+
 
 example (h : Injective f) : f ⁻¹' (f '' s) ⊆ s := by
-  sorry
+  intro x hx
+  simp at hx
+  rcases hx with ⟨y, ys, hyx⟩
+  have := h hyx
+  rw [<-this]
+  exact ys
 
 example : f '' (f ⁻¹' u) ⊆ u := by
-  sorry
+  intro x hx
+  simp at hx
+  rcases hx with ⟨y, fyu, fyx⟩
+  rw [<-fyx]
+  assumption
+
+
 
 example (h : Surjective f) : u ⊆ f '' (f ⁻¹' u) := by
-  sorry
+  intro x xu
+  rcases h x with ⟨y,hy⟩
+  use y
+  constructor
+  . simp
+    rw [hy]
+    exact xu
+  assumption
 
 example (h : s ⊆ t) : f '' s ⊆ f '' t := by
-  sorry
+  intro x hx
+  rcases hx with ⟨y, ys, fyx⟩
+  have yt := h ys
+  use y
 
 example (h : u ⊆ v) : f ⁻¹' u ⊆ f ⁻¹' v := by
-  sorry
+  intro x hx
+  simp
+  simp at hx
+  exact h hx
 
 example : f ⁻¹' (u ∪ v) = f ⁻¹' u ∪ f ⁻¹' v := by
-  sorry
+  ext x
+  constructor
+  . rintro (xu|xv)
+    . left
+      simp
+      assumption
+    right
+    simp
+    assumption
+  rintro (xu|xv)
+  . left
+    exact xu
+  right
+  exact xv
 
 example : f '' (s ∩ t) ⊆ f '' s ∩ f '' t := by
   sorry
