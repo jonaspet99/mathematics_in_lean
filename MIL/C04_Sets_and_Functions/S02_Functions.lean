@@ -106,13 +106,35 @@ example : f ⁻¹' (u ∪ v) = f ⁻¹' u ∪ f ⁻¹' v := by
   exact xv
 
 example : f '' (s ∩ t) ⊆ f '' s ∩ f '' t := by
-  sorry
+  intro x hx
+  rcases hx with ⟨y, ⟨ys, yt⟩, fyx⟩
+  constructor <;> use y
 
 example (h : Injective f) : f '' s ∩ f '' t ⊆ f '' (s ∩ t) := by
-  sorry
+  rintro x ⟨xs, xt⟩
+  rcases xs with ⟨y, ys, fyx⟩
+  rcases xt with ⟨y', y's, fy'x⟩
+  have : f y = f y' := by rw [fy'x]; exact fyx
+  have := h this
+  use y
+  constructor
+  . constructor
+    assumption
+    rw [this]
+    assumption
+  assumption
 
 example : f '' s \ f '' t ⊆ f '' (s \ t) := by
-  sorry
+  rintro x ⟨xfs, xnft⟩
+  rcases xfs with ⟨y, ys, fyx⟩
+  use y
+  constructor
+  use ys
+  intro hyt
+  apply xnft
+  rw [<- fyx]
+  use y
+  assumption
 
 example : f ⁻¹' u \ f ⁻¹' v ⊆ f ⁻¹' (u \ v) := by
   sorry
