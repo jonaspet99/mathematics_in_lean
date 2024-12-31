@@ -94,7 +94,6 @@ example : f ⁻¹' (u ∪ v) = f ⁻¹' u ∪ f ⁻¹' v := by
   constructor
   . rintro (xu|xv)
     . left
-      simp
       assumption
     right
     simp
@@ -137,36 +136,116 @@ example : f '' s \ f '' t ⊆ f '' (s \ t) := by
   assumption
 
 example : f ⁻¹' u \ f ⁻¹' v ⊆ f ⁻¹' (u \ v) := by
-  sorry
+  rintro x ⟨xfu,xnfv⟩
+  simp
+  constructor
+  use xfu
+  use xnfv
 
 example : f '' s ∩ v = f '' (s ∩ f ⁻¹' v) := by
-  sorry
+  ext x
+  constructor
+  . rintro ⟨xfs, xv⟩
+    rcases xfs with ⟨ y, hy, fys⟩
+    use y
+    constructor
+    . constructor
+      exact hy
+      simp
+      rw [fys]
+      assumption
+    assumption
+  rintro ⟨y, hy, fys⟩
+  constructor
+  . use y
+    constructor
+    exact hy.1
+    assumption
+  rw [<-fys]
+  exact hy.2
+
 
 example : f '' (s ∩ f ⁻¹' u) ⊆ f '' s ∩ u := by
-  sorry
+  intro x hx
+  rcases hx with ⟨y, hy, fyx⟩
+  rcases hy with ⟨hy₁, hy₂⟩
+  constructor
+  . use y
+  rw [<- fyx]
+  exact hy₂
+
+
 
 example : s ∩ f ⁻¹' u ⊆ f ⁻¹' (f '' s ∩ u) := by
-  sorry
+  intro x hx
+  rcases hx with ⟨hxs, hxfu⟩
+  simp at hxfu
+  dsimp
+  constructor
+  . use x
+  simp
+  assumption
 
 example : s ∪ f ⁻¹' u ⊆ f ⁻¹' (f '' s ∪ u) := by
-  sorry
+  rintro x hx
+  dsimp
+  rcases hx with xs| xfu
+  . left
+    use x
+  right
+  assumption
 
 variable {I : Type*} (A : I → Set α) (B : I → Set β)
 
 example : (f '' ⋃ i, A i) = ⋃ i, f '' A i := by
-  sorry
+  ext x
+  simp
+  constructor
+  . rintro ⟨y, ⟨⟨i, iy⟩, fyx⟩⟩
+    use i
+    use y
+  rintro ⟨i, ⟨y, ⟨hy, fyx⟩⟩⟩
+  use y
+  exact ⟨⟨i, hy⟩, fyx⟩
 
 example : (f '' ⋂ i, A i) ⊆ ⋂ i, f '' A i := by
-  sorry
+  rintro x hx
+  simp at hx
+  rcases hx with ⟨x1, ⟨hx1, hx2⟩⟩
+  simp
+  intro i
+  use x1
+  constructor
+  . exact hx1 i
+  assumption
+
 
 example (i : I) (injf : Injective f) : (⋂ i, f '' A i) ⊆ f '' ⋂ i, A i := by
-  sorry
+  intro x
+  simp
+  intro h
+  rcases h i with ⟨y, hy, hy2⟩
+  use y
+  constructor
+  . intro j
+    rcases h j with ⟨y1, hy', hy'2⟩
+    have hyy': y = y1 := by
+      apply injf
+      rw [hy'2]
+      assumption
+    rw [hyy']
+    assumption
+  assumption
+
+
 
 example : (f ⁻¹' ⋃ i, B i) = ⋃ i, f ⁻¹' B i := by
-  sorry
+  ext x
+  simp
 
 example : (f ⁻¹' ⋂ i, B i) = ⋂ i, f ⁻¹' B i := by
-  sorry
+  ext x
+  simp
 
 example : InjOn f s ↔ ∀ x₁ ∈ s, ∀ x₂ ∈ s, f x₁ = f x₂ → x₁ = x₂ :=
   Iff.refl _
