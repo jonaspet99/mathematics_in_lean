@@ -274,18 +274,54 @@ example : range exp = { y | y > 0 } := by
   use log y
   rw [exp_log ypos]
 
+#check sqrt_sq
+#check sq_sqrt
+
 example : InjOn sqrt { x | x ≥ 0 } := by
-  sorry
+  intro x posx y posy e
+  #check sqrt_eq_iff_mul_self_eq posx posy
+  calc
+    x = (√x)^2 := by rw [sq_sqrt posx]
+    _ = √y ^2 := by rw[e]
+    _ = y := by rw[sq_sqrt posy]
+
+
 
 example : InjOn (fun x ↦ x ^ 2) { x : ℝ | x ≥ 0 } := by
-  sorry
+  intro x xpos y ypos h
+  have h: x^2 = y^2 := by
+    assumption
+  calc
+    x = √(x^2) := by rw [sqrt_sq xpos]
+    _ = √(y^2) := by rw [h]
+    _ = y := by rw [sqrt_sq ypos]
 
 example : sqrt '' { x | x ≥ 0 } = { y | y ≥ 0 } := by
-  sorry
+  ext x
+  constructor
+  . rintro ⟨y, ⟨_, ysqrt⟩⟩
+    rw [← ysqrt]
+    simp
+    apply sqrt_nonneg
+  intro xpos
+  use x^2
+  constructor
+  . apply sq_nonneg x
+  apply sqrt_sq
+  exact xpos
 
 example : (range fun x ↦ x ^ 2) = { y : ℝ | y ≥ 0 } := by
-  sorry
-
+  ext x
+  constructor
+  . rintro ⟨y, hy⟩
+    dsimp at hy
+    rw [← hy]
+    exact sq_nonneg y
+  intro hx
+  dsimp at hx
+  use √x
+  dsimp
+  exact sq_sqrt hx
 end
 
 section
@@ -315,12 +351,32 @@ variable (f : α → β)
 
 open Function
 
-example : Injective f ↔ LeftInverse (inverse f) f :=
-  sorry
+example : Injective f ↔ LeftInverse (inverse f) f := by
+  constructor
+  . intro injf
+    intro x
+    -- #check
+    apply injf
+    apply inverse_spec
+    use x
+  intro hli
+  intro x y  hfxy
+  #check hli x
+  rw [<- hli x]
+  rw [hfxy]
+  apply hli
 
-example : Surjective f ↔ RightInverse (inverse f) f :=
-  sorry
 
+
+
+example : Surjective f ↔ RightInverse (inverse f) f := by
+  constructor
+  . intro hsur x
+    apply inverse_spec
+    apply hsur
+  intro hri x
+  use (inverse f) x
+  apply hri
 end
 
 section
@@ -335,11 +391,11 @@ theorem Cantor : ∀ f : α → Set α, ¬Surjective f := by
     intro h'
     have : j ∉ f j := by rwa [h] at h'
     contradiction
-  have h₂ : j ∈ S
-  sorry
-  have h₃ : j ∉ S
-  sorry
+  have h₂ : j ∈ S := by
+    exact h₁
+  have h₃ : j ∉ S := by
+    rw [← h]
+    exact h₂
   contradiction
-
 -- COMMENTS: TODO: improve this
 end
