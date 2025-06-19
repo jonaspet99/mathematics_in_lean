@@ -61,7 +61,8 @@ theorem sb_injective (hf : Injective f) : Injective (sbFun f g) := by
     exact hf hxeq
   push_neg  at xA
   rw [if_neg xA.1, if_neg xA.2] at hxeq
-  rw [← sb_right_inv f g xA.1, hxeq, sb_right_inv f g xA.2]
+  rw [← sb_right_inv f g xA.1]
+  rw [hxeq, sb_right_inv f g xA.2]
 
 theorem sb_surjective (hf : Injective f) (hg : Injective g) : Surjective (sbFun f g) := by
   set A := sbSet f g with A_def
@@ -85,4 +86,3 @@ theorem sb_surjective (hf : Injective f) (hg : Injective g) : Surjective (sbFun 
   apply leftInverse_invFun hg
 
 end
-
